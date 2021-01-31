@@ -12,7 +12,10 @@ import kotlin.time.TimeSource
 
 
 /**
- * Simulates the following suspend function.
+ * At compile time, Kotlin generates state-machine code for each suspend function.
+ *
+ * This exercise simulates the following suspend function.
+ *
  * ```kotlin
  * suspend fun foo() {
  *   delay(1000)
@@ -26,7 +29,7 @@ import kotlin.time.TimeSource
  */
 @ExperimentalTime
 fun main() {
-  // Use a latch to keep JVM spinning.
+  // Use a latch to keep the JVM spinning.
   val latch = CountDownLatch(1)
   // Record the elapsed time.
   val timer = TimeSource.Monotonic.markNow()
@@ -46,8 +49,15 @@ fun main() {
 }
 
 fun foo(continuation: Continuation<Any>): Any {
+  // In effect, state machines sub-classes kotlin.coroutines.jvm.internal.ContinuationImpl.
   class FooContinuation : Continuation<Any> {
     var label: Int = 0
+
+    // See kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith.
+    // Source code does recursion unrolling, which complicates the code a bit.
+    // Relevant commit: https://github.com/jetbrains/kotlin/commit/822faca75a14d27026f2f1034ac9a99976318f22
+    // Note that the pre-optimization code in the above link is much easier to read.
+    // Relevant issue: https://youtrack.jetbrains.com/issue/KT-18987
     override fun resumeWith(result: Result<Any>) {
       val outcome = invokeSuspend()
       if (outcome === COROUTINE_SUSPENDED) return
