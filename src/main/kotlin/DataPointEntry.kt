@@ -1,6 +1,7 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
 import DataType.*
+import com.jojotoo.api.user.HelpService
 
 
 //interface DataEntry<T> {
@@ -29,6 +30,7 @@ fun main() {
     println(it.type.name)
     println(it.value)
   }
+  HelpService::class.java
 }
 
 

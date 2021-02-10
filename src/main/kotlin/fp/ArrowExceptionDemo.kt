@@ -1,42 +1,37 @@
+@file:Suppress("UNUSED_PARAMETER")
+
 package fp
 
-import arrow.core.Either
-import arrow.core.Right
-import kotlinx.coroutines.runBlocking
-import arrow.typeclasses.*
-import arrow.core.extensions.*
 import arrow.*
-import arrow.core.Left
-import arrow.core.extensions.either.monad.flatMap
-//import arrow.core.extensions.option.monad.binding
-//import arrow.core.extensions.either.monad.binding
-import arrow.core.extensions.list.monad.List.monad
-import arrow.core.flatMap
+import arrow.core.*
+import arrow.core.computations.either
+import arrow.core.extensions.*
+import arrow.typeclasses.*
+import kotlin.random.Random
 
 
 sealed class ServiceException
-
 object NetworkUnstable : ServiceException()
+object WrongToken : ServiceException()
 
-object WrongToken: ServiceException()
+fun getToken(): Either<ServiceException, String> =
+  if (Random.nextBoolean()) "token".right() else NetworkUnstable.left()
 
+fun uploadFile(token: String): Either<ServiceException, String> =
+  if (Random.nextBoolean()) WrongToken.left() else "success".right()
 
-fun getToken(): Either<ServiceException, String> = Right("token")
+fun sendMessage(messageId: String): Either<ServiceException, String> = "success".right()
 
-fun uploadFile(token: String): Either<ServiceException, String> = Left(WrongToken)
-
-fun sendMessage(messageId: String): Either<ServiceException, String> = Right("success")
-
-fun main() {
-  val result: Either<ServiceException, String> = getToken()
-    .flatMap { uploadFile(it) }
-    .flatMap { sendMessage(it) }
-  println(result)
-
-  val result2 = Either.fx<ServiceException, String> {
-    val token = getToken().bind()
-    val messageId = uploadFile(token).bind()
-    sendMessage(messageId).bind()
-  }
-  println(result2)
+suspend fun doWork() = either<ServiceException, String> {
+  val token = getToken().bind()
+  val messageId = uploadFile(token).bind()
+  return@either sendMessage(messageId).bind()
 }
+
+suspend fun main() {
+  doWork().also {
+    println(it)
+  }
+}
+
+

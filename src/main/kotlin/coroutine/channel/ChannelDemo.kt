@@ -7,7 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 suspend fun main() {
-  val channel = Channel<Unit>()
+  val channel = Channel<Unit>(1)
 
   coroutineScope {
     launch {
@@ -16,6 +16,8 @@ suspend fun main() {
       delay(1000)
       channel.send(Unit)
     }
+
+    delay(3000)
 
     launch {
       for (i in channel) {
