@@ -73,8 +73,6 @@ dependencies {
   implementation("io.lettuce:lettuce-core:6.0.1.RELEASE")
   implementation("com.graphql-java:java-dataloader:2.2.3")
   implementation("com.github.yujinyan:faktory:ba7189282a")
-  implementation("com.jojotoo:api:master.2ed6662")
-
   kapt("com.squareup.moshi:moshi-kotlin-codegen:1.9.3")
 //  annotationProcessor("io.arrow-kt:arrow-meta:$arrowVersion")
   implementation(kotlin("script-runtime"))
