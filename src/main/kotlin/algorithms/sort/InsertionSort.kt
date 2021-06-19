@@ -1,12 +1,14 @@
 package algorithms.sort
 
-fun insertionSort(array: IntArray) {
-  for (i in 1..array.lastIndex) {
+import algorithms.sort.quick.swap
+
+// eg. 3,5,1,2,4
+fun insertionSort(arr: IntArray) {
+  for (i in 1..arr.lastIndex) {
     for (j in i downTo 1) {
-      if (array[j - 1] < array[j]) break
-      val temp = array[j - 1]
-      array[j - 1] = array[j]
-      array[j] = temp
+      if (arr[j] < arr[j - 1]) {
+        swap(arr, j, j - 1)
+      } else break
     }
   }
 }
