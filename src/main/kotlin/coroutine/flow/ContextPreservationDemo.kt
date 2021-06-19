@@ -8,9 +8,7 @@ import kotlinx.coroutines.withContext
 suspend fun main() {
   val f = flow { // BAD!!
     emit(1)
-    val value = withContext(Dispatchers.IO) {
-      2
-    }
+    val value = withContext(Dispatchers.IO) { 2 }
     emit(value)
   }
 

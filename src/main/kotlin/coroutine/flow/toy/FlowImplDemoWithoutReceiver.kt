@@ -1,8 +1,8 @@
-package coroutine.flow
+package coroutine.flow.toy
 
 import kotlinx.coroutines.delay
 
-//typealias FlowCollector<T> = suspend (value: T) -> Unit
+typealias FlowCollector<T> = suspend (value: T) -> Unit
 
 class FlowImpl2<T>(private val builder: suspend (collector: FlowCollector<T>) -> Unit) {
 
