@@ -1,4 +1,4 @@
-package json
+package serialization
 
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi

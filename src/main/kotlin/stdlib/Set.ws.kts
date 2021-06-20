@@ -1,3 +1,5 @@
+package stdlib
+
 data class Carrot(val id: Int, val name: String)
 
 val carrots1: Map<Int, Carrot> = listOf(
