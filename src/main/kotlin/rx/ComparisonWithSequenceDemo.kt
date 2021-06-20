@@ -100,7 +100,7 @@ suspend fun withFlow() {
       uploadImage(it)
     }
     .filter { it.endsWith("1") }
-    .collect {
+    .collectLatest {
       println(it)
     }
 }
