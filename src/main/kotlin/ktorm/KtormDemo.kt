@@ -1,12 +1,12 @@
 package ktorm
 
 import io.ktor.util.*
-import me.liuwj.ktorm.database.Database
-import me.liuwj.ktorm.dsl.*
-import me.liuwj.ktorm.schema.Table
-import me.liuwj.ktorm.schema.int
-import me.liuwj.ktorm.schema.varchar
-import kotlin.collections.forEach
+import org.ktorm.database.Database
+import org.ktorm.dsl.*
+import org.ktorm.schema.Table
+import org.ktorm.schema.int
+import org.ktorm.schema.varchar
+import org.ktorm.support.mysql.insertOrUpdate
 
 val database = Database.connect(
   url = "jdbc:mysql://api.beta.jojotu.cn:3306/jojotoo_test",
@@ -28,7 +28,11 @@ fun main() {
     User.cityId eq 1
   }
   println(q2.sql)
-//    .forEach {
-//      println("id: ${it[User.id]}, name: ${it[User.name]}")
-//    }
+
+
+  val u1 = User.aliased("u1")
+  val u2 = User.aliased("u2")
+  database.from(u1)
+
+  User.insertOrUpdate {  }
 }
