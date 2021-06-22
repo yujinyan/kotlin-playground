@@ -49,7 +49,7 @@ suspend fun main() {
     }
   }
 
-  supervisorScope {
+  coroutineScope {
     val token = attempt {
       fetchCredential().also { log("fetched token $it") }
     }
@@ -62,7 +62,7 @@ suspend fun main() {
       async { attempt { uploadImage(token, it) } }
     }
 
-    val urls =  futures.map { it.await() }
+    val urls = futures.map { it.await() }
     log("finished uploading $urls")
   }
 }
