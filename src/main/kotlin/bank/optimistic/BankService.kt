@@ -1,4 +1,4 @@
-package bank
+package bank.optimistic
 
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicInteger
@@ -109,43 +109,6 @@ class BankService(
 
   private val retryTimes = 5
 
-  fun transfer(tx: Transaction): Transaction {
-    val from = tx.from
-    val to = tx.to
-    val amount = tx.amount
-    when (tx.status) {
-      Transaction.Status.New -> {
-        for (i in 1..retryTimes + 1) {
-          // if (i > 1) println("debit retry $i for id: ${tx.id}")
-          if (i == retryTimes + 1) throw RemoteException(tx, "debit failed")
-          val fromBalance = from.balance
-          val nBalance = fromBalance - amount
-          if (nBalance < 0) throw InsufficientFund(tx)
-          if (from.compareAndSet(fromBalance, fromBalance - amount)) break
-        }
-        return transfer(
-          tx.copy(status = Transaction.Status.DebitSuccess).also {
-            transactions.save(it)
-          }
-        )
-      }
-      Transaction.Status.DebitSuccess -> {
-        for (i in 1..retryTimes + 1) {
-          // if (i > 1) println("credit retry $i")
-          if (i == retryTimes + 1) throw RemoteException(tx, "credit failed")
-          val toBalance = to.balance
-          if (to.compareAndSet(toBalance, toBalance + amount)) break
-        }
-        return transfer(
-          tx.copy(status = Transaction.Status.TxSuccess).also {
-            transactions.save(it)
-          }
-        )
-      }
-      Transaction.Status.TxSuccess -> return tx
-    }
-  }
-
   fun transfer(from: Account, to: Account, amount: Int): Result<Transaction> {
     val tx = Transaction(transactions.nextId(), from, to, amount, Transaction.Status.New)
     transactions.save(tx)
@@ -158,6 +121,39 @@ class BankService(
       if (it !is TransferException) {
         return Result.failure(RemoteException(tx, it.message))
       }
+    }
+  }
+
+  private fun transfer(tx: Transaction): Transaction {
+    val from = tx.from
+    val to = tx.to
+    val amount = tx.amount
+    when (tx.status) {
+      Transaction.Status.New -> {
+        val nTx = tx.copy(status = Transaction.Status.DebitSuccess).also {
+          transactions.save(it)
+        }
+        for (i in 1..retryTimes + 1) {
+          if (i == retryTimes + 1) throw RemoteException(tx, "debit failed")
+          val fromBalance = from.balance
+          val nBalance = fromBalance - amount
+          if (nBalance < 0) throw InsufficientFund(tx)
+          if (from.compareAndSet(fromBalance, fromBalance - amount)) break
+        }
+        return transfer(nTx)
+      }
+      Transaction.Status.DebitSuccess -> {
+        val nTx = tx.copy(status = Transaction.Status.TxSuccess).also {
+          transactions.save(it)
+        }
+        for (i in 1..retryTimes + 1) {
+          if (i == retryTimes + 1) throw RemoteException(tx, "credit failed")
+          val toBalance = to.balance
+          if (to.compareAndSet(toBalance, toBalance + amount)) break
+        }
+        return transfer(nTx)
+      }
+      Transaction.Status.TxSuccess -> return tx
     }
   }
 

@@ -1,4 +1,4 @@
-package bank
+package bank.optimistic
 
 import java.util.concurrent.*
 import kotlin.concurrent.thread
