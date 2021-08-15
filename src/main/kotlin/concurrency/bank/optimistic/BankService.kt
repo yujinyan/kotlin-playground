@@ -1,4 +1,4 @@
-package bank.optimistic
+package concurrency.bank.optimistic
 
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicInteger

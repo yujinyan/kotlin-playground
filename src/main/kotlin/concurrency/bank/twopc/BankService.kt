@@ -1,4 +1,4 @@
-package bank.twopc
+package concurrency.bank.twopc
 
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean

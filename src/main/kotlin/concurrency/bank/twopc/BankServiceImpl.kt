@@ -1,6 +1,6 @@
-package bank.twopc
+package concurrency.bank.twopc
 
-import bank.twopc.Transaction.State.*
+import concurrency.bank.twopc.Transaction.State.*
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicInteger
 

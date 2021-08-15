@@ -1,7 +1,6 @@
-package bank.optimistic
+package concurrency.bank.optimistic
 
 import java.util.concurrent.*
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 
 fun main() {
